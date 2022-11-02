@@ -13,7 +13,7 @@ export default function Home() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [memos, setMemos] = useState([]);
 
   const onNameChange = (event) => {
     setName(event.target.value);
@@ -74,7 +74,7 @@ export default function Home() {
         );
 
         console.log("buying coffee..")
-        const coffeeTxn = await buyMeCoffee.buyCoffee(
+        const coffeeTxn = await buyMeCoffee.getCoffee(
           name ? name : "anon",
           message ? message : "Enjoy your coffee!",
           {value: ethers.utils.parseEther("0.001")}
@@ -96,7 +96,7 @@ export default function Home() {
   };
 
   // Function to fetch all memos stored on-chain.
-  const getMessages = async () => {
+  const getMemos = async () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
@@ -109,9 +109,9 @@ export default function Home() {
         );
         
         console.log("fetching memos from the blockchain..");
-        const messages = await buyMeCoffee.getMessages();
+        const memos = await buyMeCoffee.getMemos();
         console.log("fetched!");
-        setMessage(message);
+        setMemos(memos);
       } else {
         console.log("Metamask is not connected");
       }
@@ -124,13 +124,13 @@ export default function Home() {
   useEffect(() => {
     let buyMeCoffee;
     isWalletConnected();
-    getMessages();
+    getMemos();
 
     // Create an event handler function for when someone sends
     // us a new memo.
-    const onNewMessage = (from, timestamp, name, message) => {
+    const onNewMemo = (from, timestamp, name, message) => {
       console.log("Memo received: ", from, timestamp, name, message);
-      setMessages((prevState) => [
+      setMemos((prevState) => [
         ...prevState,
         {
           address: from,
@@ -153,12 +153,12 @@ export default function Home() {
         signer
       );
 
-      buyMeCoffee.on("NewMessage", onNewMessage);
+      buyMeCoffee.on("NewMemo", onNewMemo);
     }
 
     return () => {
       if (buyMeCoffee) {
-        buyMeCoffee.off("NewMessage", onNewMessage);
+        buyMeCoffee.off("NewMemo", onNewMemo);
       }
     }
   }, []);
@@ -186,7 +186,7 @@ export default function Home() {
                 <br/>
                 
                 <input
-                  className='px-2 py-1 rounded mt-2'
+                  className='px-2 py-1 rounded'
                   id="name"
                   type="text"
                   placeholder="anon"
@@ -195,26 +195,24 @@ export default function Home() {
               </div>
               <br/>
               <div class="formgroup">
-                <label className='text-beige' >
+                <label className='text-beige'>
                   Send Shree a message
                 </label>
                 <br/>
 
                 <textarea
-                  className='px-2 py-1 rounded mt-2'
+                  className='px-2 py-1 rounded'
                   rows={3}
                   placeholder="Enjoy your coffee!"
                   id="message"
                   onChange={onMessageChange}
-                  
                   required
                 >
                 </textarea>
-                
               </div>
               <div>
                 <button
-                  className='bg-green-400 hover:bg-green-500 text-black font-bold py-2 mt-6 px-4 border-b-4 border-green-900 rounded'
+                className='bg-green-500 hover:bg-green-400 text-white font-bold py-2 mt-4 px-4 border-b-4 border-green-900 rounded' 
                   type="button"
                   onClick={buyCoffee}
                 >
@@ -224,27 +222,26 @@ export default function Home() {
             </form>
           </div>
         ) : (
-          <button className='bg-green-400 hover:bg-green-500 text-black font-bold py-2 mt-6 px-4 border-b-4 border-green-900 rounded' onClick={connectWallet}> Connect your wallet </button>
+          <button className='bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-900 rounded' onClick={connectWallet}> Connect your wallet </button>
         )}
       </main>
 
       {currentAccount && (<h1>Memos received</h1>)}
 
-      {currentAccount && (messages.map((message, idx) => {
+      {currentAccount && (memos.map((memo, idx) => {
         return (
           <div key={idx} style={{border:"2px solid", "border-radius":"5px", padding: "5px", margin: "5px"}}>
-            <p style={{"font-weight":"bold"}}>"{message.message}"</p>
-            <p>From: {message.name} at {message.timestamp.toString()}</p>
+            <p style={{"font-weight":"bold"}}>"{memo.message}"</p>
+            <p>From: {memo.name} at {memo.timestamp.toString()}</p>
           </div>
         )
       }))}
 
-      <footer className={styles.footer}>
+      <footer className="text-beige">
         <a
           href="https://twitter.com/shrirajpawar04"
           target="_blank"
           rel="noopener noreferrer"
-          className='text-beige'
         >
           Created by @shrirajpawar04
         </a>

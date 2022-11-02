@@ -1,16 +1,16 @@
-//SPDX-License-Indetifier: Unlicense
+//SPDX-License-Indetifier: Unlicensed
 
 pragma solidity ^0.8.0;
 
 contract BuyMeCryptoCoffee {
-    event NewMessage (
+    event NewMemo (
         address indexed from,
         uint256 timestamp,
         string name,
         string message
     );
 
-    struct Message {
+    struct Memo {
         address from;
         uint256 timestamp;
         string name;
@@ -20,27 +20,27 @@ contract BuyMeCryptoCoffee {
 
     address payable owner;
 
-    Message[] message;
+    Memo[] memos;
 
     constructor() {
         owner = payable(msg.sender);
     }
 
-    function getMessage() public view returns (Message[] memory) {
-        return message;
+    function getMemos() public view returns (Memo[] memory) {
+        return memos;
     }
 
     function getCoffee(string memory _name, string memory _message) public payable {
         require(msg.value > 0, "Can't send message for free");
 
-        message.push(Message(
+        memos.push(Memo(
             msg.sender,
             block.timestamp,
             _name,
             _message
         ));
 
-        emit NewMessage(msg.sender, block.timestamp, _name, _message);
+        emit NewMemo(msg.sender, block.timestamp, _name, _message);
     }
 
     function withdraw() public {

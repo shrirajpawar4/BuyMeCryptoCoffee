@@ -14,12 +14,12 @@ async function printBalance(addresses) {
   }
 }
 
-async function printMessage(messages) {
-  for (const message of messages) {
-    const timestamp = message.timestamp;
-    const tipper = message.name;
-    const tipperAddress = message.from;
-    const message = message.message;
+async function printMessage(memos) {
+  for (const memo of memos) {
+    const timestamp = memo.timestamp;
+    const tipper = memo.name;
+    const tipperAddress = memo.from;
+    const message = memo.message;
     
     console.log(`At ${timestamp}, ${tipper} (${tipperAddress}) said: "${message}"`);
   }
@@ -53,8 +53,8 @@ async function main() {
   await printBalance(addresses);
 
   console.log("__see messages__");
-  const messages = await buyMeCoffee.getMessage();
-  printMessage(messages);
+  const memos = await buyMeCoffee.getMemos();
+  printMessage(memos);
 }
 
 main()
@@ -64,4 +64,4 @@ main()
     process.exit(1);
   });
 
-  //0x4a267209489DE6585A284d07183001B3880dC732
+  //0x796AAaA799A802Ce35f892Dfc40F7fe973d8Fc19
